@@ -126,24 +126,17 @@ class nuestras_plazas
 
 	}
 
-	
-
-	
-
-
 	public function cargalistas($url,$lista_zonas,$lista_contratistas)
 	{
 		
 		$data = file_get_contents($url);
 		$resultado = json_decode($data);
 		foreach ($resultado->results as $zona) {
-			
 			$objzona=['id' => $zona->id, 'nombre'=>$zona->nombre];
 			array_push($lista_zonas,(array)$objzona );
 
 			$objorg=array('CUIT' => $zona->CUIT, 'organizacion'=>$zona->organizacion);
 			array_push($lista_contratistas, (array)$objorg);
-
 		}
 		$listas=["zonas"=>$lista_zonas,"contratistas"=>$lista_contratistas];
 		if(!empty($resultado->next))
@@ -162,7 +155,7 @@ class nuestras_plazas
             'timeout' => 1000   // Timeout in seconds
         )
     	));
-		$data = file_get_contents($url,0,$context);
+		$data = file_get_contents($url);
 		$resultado = json_decode($data);
 			//var_dump($resultado->results);
 		foreach ($resultado->results->features as $zona) {
@@ -180,13 +173,16 @@ class nuestras_plazas
 			//var_dump($plazas);
 			return $plazas;
 		}
+		
+		
+
 	}
 
 
 	public function render_shortcode_nuestras_plazas($atributos = [], $content = null, $tag = '')
 
 	{
-		wp_enqueue_script('carga-plugin-nuestras_plazas',$urlJSNuestrasPlazas,null,false,false);
+		//wp_enqueue_script('carga-plugin-nuestras_plazas',$urlJSNuestrasPlazas,null,false,false);
 		$atributos = array_change_key_case((array)$atributos, CASE_LOWER);
 
 	    $atr=shortcode_atts([],$atributos, $tag);
@@ -195,14 +191,38 @@ class nuestras_plazas
 		$lista_contratistas=array();
 		$plazas=array();
 		$datos=$this->cargalistas("https://gobiernoabierto.cordoba.gob.ar/api/v2/espacios-verdes/espacios-verdes/",$lista_zonas,$lista_contratistas);
-		$dibuja =$this->cargamapa("https://gobiernoabierto.cordoba.gob.ar/api/v2/espacios-verdes/frentes-espacios-verdes/?id_zona=1",$plazas);
-		var_dump($dibuja);
+		$dibuja =$this->cargamapa("https://gobiernoabierto.cordoba.gob.ar/api/v2/espacios-verdes/frentes-espacios-verdes/?id_zona=8",$plazas);
+			
+			$listaobj =array();
+			$vertices = array();
+//count($dibuja)-1
+			for ($i=0; $i <= 1; $i++) { 
+				foreach ($dibuja[$i]['coordenadas'] as $coord) {
+					$listadatos = new stdClass();
+					$listadatos->lng= floatval(str_replace(',', '.', $coord[0]));
+					$listadatos->lat= floatval(str_replace(',', '.', $coord[1]));
 
-		
-		
+					array_push($vertices,$listadatos);
+
+				}
+				$obj = new stdClass();
+				$obj->obj=$vertices;
+
+
+				array_push($listaobj,$obj);
+
+			}
+			//var_dump($obj);
+
+
+
 		$sc="";
 
-		$sc.='<div id="buscador">
+		$sc.='
+		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAdhknpOExGWhcYbEXKLfnPHqND4ejjqpE"
+  type="text/javascript"></script>
+		<script src="'. plugin_dir_url( __FILE__ ). 'js/plugin_nuestras_plazas.js"></script>
+		<div id="buscador">
 
 				<div class="campo">
 
@@ -256,8 +276,13 @@ class nuestras_plazas
 			
 			
 
-			$sc.='<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAdhknpOExGWhcYbEXKLfnPHqND4ejjqpE&callback=mapaPlazas"
-  type="text/javascript"></script>';
+			$sc.='
+	<script>
+	var lista = '.json_encode($listaobj).';
+	mapaPlazas();
+	marcaespacio(lista,"'.$dibuja[1]["coordenadas"].'","Juan Perez","rgb(0,0,0)");</script>
+
+  ';
 
 		return $sc;
 
