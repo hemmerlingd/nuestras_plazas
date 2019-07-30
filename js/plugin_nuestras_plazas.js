@@ -1,3 +1,32 @@
+(function(window, document, $) {
+const $plazas = $('#plazas');
+const $form = $plazas.find('form');
+let $resultados = $plazas.find('.resultados');
+
+$form.submit(function(e) {
+    e.preventDefault();
+    const datos = $form.serializeArray();
+    //console.log(datos);
+    $.ajax({
+      type: "POST",
+      dataType: "JSON",
+      url: nuestras_plazas.url,
+      data: {
+        action: 'nuestras_plazas',
+        nonce: nuestras_plazas.nonce,
+        zona: datos[0].value
+      },
+      success: function(response) {
+        if (response.data) {
+        	//console.log(response.data);
+          $resultados.html(response.data);
+        }
+      }
+    });
+  });
+
+})(window, document, jQuery);
+
 var map;
 
 
@@ -17,10 +46,9 @@ function mapaPlazas()
 function marcaespacio(lista,nombre,contratista,color)
 {
 	
-	//var poligono = [];
+	//console.log(lista);
 	var arr = new Array();
 	var poligono =[];
-
 	for (var i = lista.length - 1; i >= 0; i--) {
 		/*---------COLOR-----------*/
 		var a = Math.floor((Math.random() * 255) + 1);
@@ -29,9 +57,8 @@ function marcaespacio(lista,nombre,contratista,color)
 		var color = 'rgb('+a+','+b+','+c+')';
 		/*-------FIN COLOR---------*/
 		
-		arr=[];
-		poligono=[];
 		var plantilla="<div class='info'><div class='cabecera'><div class='icono'><img src='https://www.cordoba.gob.ar/wp-content/uploads/2019/07/arbol.png'></div><div class='titulo'>NUESTRAS PLAZAS Y PASESO</div></div><hr><div class='nombre'>PLAZA COLÓN</div><div class='foto'><img src='https://gobiernoabierto.cordoba.gob.ar/media/__sized__/imagenes/obras/IMG_7346-thumbnail-500x500-70.JPG'></div><div class='contratista'>JUAN PEREZ</div><a href=''><span>Ver más info</span></a></div>";
+		
 		
 		for (var a = lista[i].obj.length - 1; a >= 0; a--) {
 			arr.push( new google.maps.LatLng(
@@ -39,9 +66,6 @@ function marcaespacio(lista,nombre,contratista,color)
 	                    parseFloat(lista[i].obj[a].lng)
 	            ));
 		}
-
-		console.log(arr);
-
 		poligono.push(new google.maps.Polygon({
             paths: arr,
             strokeColor: color,
@@ -50,21 +74,24 @@ function marcaespacio(lista,nombre,contratista,color)
             fillColor: color,
             fillOpacity: 0.35
         }));
-
+		//console.log(lista[i].obj);
 		poligono[poligono.length-1].setMap(map);
-		//console.log(poligono);
-	   // var popup = new google.maps.InfoWindow();
 
+	    var popup = new google.maps.InfoWindow();
 	   /* poligono.addListener('click', function (e) {
 		    popup.setContent(plantilla);
 		    popup.setPosition(e.latLng);
 		    popup.open(map);
 		});*/
-	}
-}	
-function filtra()
-{
-	//marcaespacio(verticesPoligono,"Plaza Colón","Juan Perez","rgb(0,0,0)");
-}
 
+
+		arr=[];
+		poligono=[];
+	}
+		
+}	
+function filtra(lista)
+{
+	marcaespacio(lista,"Plaza Colón","Juan Perez","rgb(0,0,0)");
+}
 
