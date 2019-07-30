@@ -65,17 +65,13 @@ class nuestras_plazas
 		
 		global $post;
 	    if( is_a( $post, 'WP_Post' ) && has_shortcode( $post->post_content, 'nuestras_plazas') ) {
-			wp_enqueue_script(
-				'nuestras_plazas_ajax', 
-				$urlJSNuestrasPlazas, 
-				array('jquery'), 
-				'1.0.0',
-				TRUE
-			);
+			
+			wp_enqueue_style('plugin_nuestras_plazas_css', $urlCSSShortcode);
+			wp_enqueue_script('carga-plugin-nuestras_plazas',$urlJSNuestrasPlazas,array('jquery'),'1.0.0',true);
 			//wp_enqueue_style('buscador_quinteros.css', $this->cargar_url_asset('/css/shortcodeQuinteros.css'));
 			$nonce_plazas = wp_create_nonce("nuestras_plazas_nonce");
 			wp_localize_script(
-				'nuestras_plazas_ajax', 
+				'carga-plugin-nuestras_plazas', 
 				'nuestras_plazas', 
 				array(
 					'url'   => admin_url('admin-ajax.php'),
@@ -97,14 +93,14 @@ class nuestras_plazas
 
 	{
 
-		if (is_null($api_response)) {
+		/*if (is_null($api_response)) {
 			return [ 'results' => [] ];
 		} else if (is_wp_error($api_response)) {
 			return [ 'results' => [], 'error' => 'Ocurri&oacute; un error al cargar '.$tipoObjeto.'.'.$mensaje];
 		} else {
 			$respuesta = json_decode(wp_remote_retrieve_body($api_response), true);
 			return $respuesta;
-		}
+		}*/
 	}
 
 	public function cargalistas($url,$lista_zonas,$lista_contratistas)
@@ -146,11 +142,12 @@ class nuestras_plazas
 		//$listas=["zonas"=>$lista_zonas,"contratistas"=>$lista_contratistas];
 		if(!empty($resultado->next))
 		{
-			return $this->cargamapa($resultado->next,$plazas);
+			//return $this->cargamapa($resultado->next,$plazas);
 		}else{
 			//var_dump($plazas);
-			return $plazas;
+			//return $plazas;
 		}
+		return $plazas;
 	}
 
 	public function coordenadas($dibuja){
@@ -172,8 +169,7 @@ class nuestras_plazas
 
 	public function render_shortcode_nuestras_plazas($atributos = [], $content = null, $tag = '')
 	{
-		wp_enqueue_style('plugin_nuestras_plazas_css', $urlCSSShortcode);
-		wp_enqueue_script('carga-plugin-nuestras_plazas',$urlJSNuestrasPlazas,null,false,false);
+		
 		$atributos = array_change_key_case((array)$atributos, CASE_LOWER);
 	    $atr=shortcode_atts([],$atributos, $tag);
 	    $lista_zonas=array();
@@ -200,16 +196,7 @@ class nuestras_plazas
 						}
 			  $sc.='</select>
 				</div>
-				<div class="campo">
-					<select id="tipo" onchange="javascript:filtra()">
-						<option value="">Seleccione el contratista</option>';
-						foreach($datos['contratistas'] as $contra)
-						{
-							$sc.="<option value='".$contra['CUIT']."'>".$contra['organizacion']."</option>";
-						}
-			  $sc.='</select>
-			  
-			</div>
+				
 			<div class="campo">
 				<button id="filtros__buscar" type="submit">Buscar</button>
 				</div>	</form>
@@ -220,13 +207,20 @@ class nuestras_plazas
 			return $sc;
 	}
 	
-
+	public function actualizar($url)
+	{
+		
+		$plazas=array();
+		$dibuja =$this->cargamapa($url,$plazas);
+		return $this->coordenadas($dibuja);
+			
+	}
+	
 	public function renderizar_resultados($datos){
 			$coordenadas=$this->coordenadas($datos);	
 			$html.='<!--<div id="loading"><img src="'.plugin_dir_url( __FILE__ ).'images/loading.gif" /></div>-->
-			<div id="resultados">
-			</div>
 			<div id="map"></div>
+			<div id="resultados"></div>
 			';
 			$html.='
 			<script>
@@ -251,10 +245,12 @@ class nuestras_plazas
 		check_ajax_referer('nuestras_plazas_nonce', 'nonce');
 
 		if(true) {
-			$api_response = wp_remote_get(self::$URL_API_GOB.'?id_zona='.$zona, [ 'timeout' => 1000 ]);
-			$api_data = json_decode(wp_remote_retrieve_body($api_response), true);
-			var_dump($api_data);
-			wp_send_json_success($this->renderizar_resultados($api_data));
+			//$api_response = wp_remote_get(self::$URL_API_GOB.'?id_zona='.$zona, [ 'timeout' => 1000 ]);
+			//$api_data = json_decode(wp_remote_retrieve_body($api_response), true);
+			//var_dump($api_data);
+			$datos=$this->actualizar(self::$URL_API_GOB.'?id_zona='.$zona);
+			$response = array( 'success' => true, 'data' => $datos ); // if $data passed
+			wp_send_json_success($response);
 		} else {
 			wp_send_json_error($api_data);
 		}
