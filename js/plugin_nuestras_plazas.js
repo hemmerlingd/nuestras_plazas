@@ -70,23 +70,23 @@ function marcaespacio(lista,nombre,contratista,color)
 	                    parseFloat(lista[i].obj[a].lng)
 	            ));
 		}
-		poligono.push(new google.maps.Polygon({
+		poligono = new google.maps.Polygon({
             paths: arr,
+            map: map,
             strokeColor: color,
             strokeOpacity: 0.8,
             strokeWeight: 2,
             fillColor: color,
             fillOpacity: 0.35
-        }));
+        });
 		//console.log(lista[i].obj);
-		poligono[poligono.length-1].setMap(map);
 
 	    var popup = new google.maps.InfoWindow();
-	   /* poligono.addListener('click', function (e) {
+	    poligono.addListener('click', function (e) {
 		    popup.setContent(plantilla);
 		    popup.setPosition(e.latLng);
 		    popup.open(map);
-		});*/
+		});
 
 
 		arr=[];

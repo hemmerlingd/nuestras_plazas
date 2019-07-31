@@ -132,22 +132,25 @@ class nuestras_plazas
     	));
 		$data = file_get_contents($url);
 		$resultado = json_decode($data);
-			//var_dump($resultado->results);
+
 		foreach ($resultado->results->features as $zona) {
-			//var_dump($zona);
-         // referenciar();
-			$objzona=['id'=> $zona->id, 'nombre' => $zona->properties->obra, 'foto'=>$zona->properties->adjuntos[0]->foto->thumbnail_500, 'coordinates'=> $zona->geometry->coordinates];
+			if(!isset($zona->properties->nombre)){
+				$objzona=['id'=> $zona->id, 'nombre' => $zona->properties->obra, 'foto'=>$zona->properties->adjuntos[0]->foto->thumbnail_500, 'coordinates'=> $zona->geometry->coordinates];
+			}else{
+				if ($zona->geometry->coordinates[0]){
+					$objzona=['id'=> $zona->id, 'nombre' => $zona->properties->nombre, 'coordinates'=> $zona->geometry->coordinates[0]];
+				}
+			}	
 			array_push($plazas,(array)$objzona );
 		}
 		//$listas=["zonas"=>$lista_zonas,"contratistas"=>$lista_contratistas];
 		if(!empty($resultado->next))
 		{
-			//return $this->cargamapa($resultado->next,$plazas);
+			return $this->cargamapa($resultado->next,$plazas);
 		}else{
 			//var_dump($plazas);
-			//return $plazas;
+			return $plazas;
 		}
-		return $plazas;
 	}
 
 	public function coordenadas($dibuja){
@@ -201,7 +204,7 @@ class nuestras_plazas
 				<button id="filtros__buscar" type="submit">Buscar</button>
 				</div>	</form>
 			</div>';
-				$dibuja =$this->cargamapa("https://gobiernoabierto.cordoba.gob.ar/api/v2/espacios-verdes/frentes-espacios-verdes/?id_zona=2",$plazas);
+				$dibuja =$this->cargamapa("https://gobiernoabierto.cordoba.gob.ar/api/v2/cpc/cpc-geo",$plazas);
 				//$coordenadas=$this->coordenadas($dibuja);
 			$sc .= $this->renderizar_resultados($dibuja);
 			return $sc;
