@@ -135,10 +135,11 @@ class nuestras_plazas
 
 		foreach ($resultado->results->features as $zona) {
 			if(!isset($zona->properties->nombre)){
-				$objzona=['id'=> $zona->id, 'nombre' => $zona->properties->obra, 'foto'=>$zona->properties->adjuntos[0]->foto->thumbnail_500, 'coordinates'=> $zona->geometry->coordinates];
+				$foto = 'https://gobiernoabierto.cordoba.gob.ar/'.$zona->properties->adjuntos[0]->foto->thumbnail_500;
+				$objzona=['id'=> $zona->id, 'nombre' => $zona->properties->descripcion_frente, 'foto'=> $foto, 'coordinates'=> $this->formatcoordenadas($zona->geometry->coordinates)];
 			}else{
 				if ($zona->geometry->coordinates[0]){
-					$objzona=['id'=> $zona->id, 'nombre' => $zona->properties->nombre, 'coordinates'=> $zona->geometry->coordinates[0]];
+					$objzona=['id'=> $zona->id, 'nombre' => $zona->properties->nombre, 'foto'=>'https://live.staticflickr.com/944/41450533534_4c12363575_z_d.jpg', 'coordinates'=> $this->formatcoordenadas($zona->geometry->coordinates[0])];
 				}
 			}	
 			array_push($plazas,(array)$objzona );
@@ -152,8 +153,18 @@ class nuestras_plazas
 			return $plazas;
 		}
 	}
-
-	public function coordenadas($dibuja){
+	public function formatcoordenadas($cord){
+		$listaobj =array();
+		$vertices = array();
+		for ($i=0;$i<=count($cord)-1;$i++) {
+			$listadatos = new stdClass();
+			$listadatos->lng=floatval(str_replace(',', '.', $cord[$i][0]));
+			$listadatos->lat=floatval(str_replace(',', '.', $cord[$i][1]));
+			array_push($vertices,$listadatos);
+		}
+		return $vertices; 
+	}
+/*	public function coordenadas($dibuja){
 		$listaobj =array();
 		for ($i=0; $i <= count($dibuja)-1; $i++) { 
 		$vertices = array();
@@ -166,9 +177,10 @@ class nuestras_plazas
 			$obj = new stdClass();
 			$obj->obj=$vertices;
 			array_push($listaobj,$obj);
+			
 		}
-		return $listaobj;
-	}
+		return $dibuja;
+	}*/
 
 	public function render_shortcode_nuestras_plazas($atributos = [], $content = null, $tag = '')
 	{
@@ -215,21 +227,28 @@ class nuestras_plazas
 		
 		$plazas=array();
 		$dibuja =$this->cargamapa($url,$plazas);
-		return $this->coordenadas($dibuja);
+		return $dibuja;
+		//return $this->coordenadas($dibuja);
 			
 	}
 	
 	public function renderizar_resultados($datos){
-			$coordenadas=$this->coordenadas($datos);	
-			$html.='<!--<div id="loading"><img src="'.plugin_dir_url( __FILE__ ).'images/loading.gif" /></div>-->
-			<div id="map"></div>
-			<div id="resultados"></div>
+			//$coordenadas=$this->coordenadas($datos);	
+			//$coordenadas= $datos[0]['coordinates'];
+			
+			$html.='
+			<div id="resultados">
+				<div class="cargando" style="display:none;">
+					<img alt="Cargando..." src="'.plugins_url('images/loading.gif', __FILE__).'">
+				</div>
+				<div id="map"></div>
+			</div>
 			';
 			$html.='
 			<script>
-			var lista = '.json_encode($coordenadas).';
+			var lista = '.json_encode($datos).';
 			mapaPlazas();
-			marcaespacio(lista,"NOMBRE","Juan Perez","rgb(0,0,0)");</script></div>';
+			marcaespacio(lista);</script></div>';
 			return $html;
 
 	}
