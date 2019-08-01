@@ -16,18 +16,11 @@ Author URI: https://github.com/perloignacio/
 
 */
 
-
-
 setlocale(LC_ALL,"es_ES");
 
 date_default_timezone_set('America/Argentina/Cordoba');
 
 add_action('plugins_loaded', array('nuestras_plazas', 'get_instancia'));
-
-
-
-
-	
 
 
 class nuestras_plazas
@@ -132,14 +125,18 @@ class nuestras_plazas
     	));
 		$data = file_get_contents($url);
 		$resultado = json_decode($data);
-
+		$hoy = date("d-m-y");
+		$arrfotos = array();
+		$objfoto=['thumbnail_500'=>'/media/imagenes/eventos-publicos/actividades/amocba_7Pv3HG7.jpg'];
+		$objadj=['foto'=>$objfoto, 'fecha'=>$hoy];
+		array_push($arrfotos,(array)$objadj );
 		foreach ($resultado->results->features as $zona) {
 			if(!isset($zona->properties->nombre)){
-				$foto = 'https://gobiernoabierto.cordoba.gob.ar/'.$zona->properties->adjuntos[0]->foto->thumbnail_500;
+				$foto = $zona->properties->adjuntos;
 				$objzona=['id'=> $zona->id, 'nombre' => $zona->properties->descripcion_frente, 'foto'=> $foto, 'coordinates'=> $this->formatcoordenadas($zona->geometry->coordinates)];
 			}else{
 				if ($zona->geometry->coordinates[0]){
-					$objzona=['id'=> $zona->id, 'nombre' => $zona->properties->nombre, 'foto'=>'https://live.staticflickr.com/944/41450533534_4c12363575_z_d.jpg', 'coordinates'=> $this->formatcoordenadas($zona->geometry->coordinates[0])];
+					$objzona=['id'=> $zona->id, 'nombre' => $zona->properties->nombre, 'foto'=>$arrfotos, 'coordinates'=> $this->formatcoordenadas($zona->geometry->coordinates[0])];
 				}
 			}	
 			array_push($plazas,(array)$objzona );
@@ -192,7 +189,6 @@ class nuestras_plazas
 		$plazas=array();
 		$datos=$this->cargalistas("https://gobiernoabierto.cordoba.gob.ar/api/v2/espacios-verdes/espacios-verdes/",$lista_zonas,$lista_contratistas);
 		
-
 		$sc="";
 
 		$sc.='
@@ -224,18 +220,12 @@ class nuestras_plazas
 	
 	public function actualizar($url)
 	{
-		
 		$plazas=array();
 		$dibuja =$this->cargamapa($url,$plazas);
 		return $dibuja;
-		//return $this->coordenadas($dibuja);
-			
 	}
 	
 	public function renderizar_resultados($datos){
-			//$coordenadas=$this->coordenadas($datos);	
-			//$coordenadas= $datos[0]['coordinates'];
-			
 			$html.='
 			<div id="resultados">
 				<div class="cargando" style="display:none;">
@@ -257,7 +247,6 @@ class nuestras_plazas
 //Nacho
 	//AIzaSyAdhknpOExGWhcYbEXKLfnPHqND4ejjqpE
 	
-
 	public function nuestras_plazas()
 	{
 		$zona='';
@@ -279,42 +268,21 @@ class nuestras_plazas
 		die();
 	}
 
-
-
-
-
 	/*public function boton_shortcode_repecticiones() {
-
 		if (!current_user_can('edit_posts') && !current_user_can('edit_pages') && get_user_option('rich_editing') == 'true')
-
 			return;
-
-
-
 		add_filter("mce_external_plugins", array($this, "registrar_tinymce_plugin")); 
-
 		add_filter('mce_buttons', array($this, 'agregar_boton_tinymce_shortcode_repeticiones'));
-
 	}
 
-
-
-		public function registrar_tinymce_plugin($plugin_array) {
-
+	public function registrar_tinymce_plugin($plugin_array) {
 		$plugin_array['repeticiones_button'] = $this->cargar_url_asset('/js/shortcode_repeticiones.js');
-
 	    return $plugin_array;
-
 	}
-
-
 
 	public function agregar_boton_tinymce_shortcode_repeticiones($buttons) {
-
 	    $buttons[] = "repeticiones_button";
-
 	    return $buttons;
-
 	}
 	*/
 	

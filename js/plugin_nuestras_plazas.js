@@ -52,7 +52,7 @@ function mapaPlazas()
 }
 
 var slideIndex = 1;
-showDivs(slideIndex);
+//showDivs(slideIndex);
 
 function plusDivs(n) {
   showDivs(slideIndex += n);
@@ -69,6 +69,39 @@ function showDivs(n) {
   x[slideIndex-1].style.display = "block";  
 }
 
+function mostrarfoto(position,lista){
+	var	foto="";
+	/*lista[position]['foto'].length-1*/
+	var x=0;
+	var fecha;
+	var fechaformateada;
+	var cant=lista[position]['foto'].length-1;
+	for (var b=0; b<=lista[position]['foto'].length-1 ;b++){
+		if(x==0){
+			foto+="<div class='mySlides'>";
+		}
+		console.log(lista[position]['foto'][b].foto);
+		if(lista[position]['foto'][b].fecha !== null){
+			fecha = lista[position]['foto'][b].fecha.substring(0,10);
+			fecha = fecha.split('-');
+			fechaformateada = fecha[2]+'-'+fecha[1]+'-'+fecha[0];
+		}else{
+			fechaformateada='';
+		}
+		foto += "<div class='content_img'><img src='https://gobiernoabierto.cordoba.gob.ar/"+lista[position]['foto'][b].foto.thumbnail_500+"'><div class='fecha'>"+fechaformateada+"</div></div>";
+		if(x==1 || b==cant){
+			foto+="</div>";
+			x=0;
+		}else{
+			x+=1;
+		}
+		
+	}
+	
+	return "<div class='info'><div class='cabecera'><div class='icono'><img src='https://www.cordoba.gob.ar/wp-content/uploads/2019/07/arbol.png'></div><div class='titulo'>NUESTRAS PLAZAS Y PASEOS</div></div><hr><div class='nombre'>"+lista[position]['nombre']+"</div><div class='button-mover'><button class='mover izq' onclick='plusDivs(-1)'>&#10094;</button><button class='mover der' onclick='plusDivs(1)'>&#10095;</button></div><div class='foto' id='content_foto'>"+foto+"</div></div>";
+}
+
+
 function marcaespacio(lista)
 {
 	
@@ -83,10 +116,6 @@ function marcaespacio(lista)
 		var c = Math.floor((Math.random() * 255) + 1);
 		var color = 'rgb('+a+','+b+','+c+')';
 		/-------FIN COLOR---------/
-		
-		foto += "<img class='mySlides' src='"+lista[i]['foto']+"'>";
-
-		var plantilla="<div class='info'><div class='cabecera'><div class='icono'><img src='https://www.cordoba.gob.ar/wp-content/uploads/2019/07/arbol.png'></div><div class='titulo'>NUESTRAS PLAZAS Y PASEOS</div></div><hr><div class='nombre'>"+lista[i]['nombre']+"</div><div class='button-mover'><button class='mover izq' onclick='plusDivs(-1)'>&#10094;</button><button class='mover der' onclick='plusDivs(1)'>&#10095;</button></div><div class='foto'>"+foto+"</div><a href=''><span>Ver más info</span></a></div>";
 		
 			//console.log(lista[i]['coordinates'].length);
 		
@@ -120,16 +149,17 @@ function marcaespacio(lista)
 		    popup.open(map);
 		});*/
 
-		poligono.addListener('click', (function(content) {
+		poligono.addListener('click', (function(position,lista) {
 		  return function() {
 		    // set the content
-		    popup.setContent(content);
+		    popup.setContent(mostrarfoto(position,lista));
 		    // set the position
 		    popup.setPosition(this.center);
 		    // open it
 		    popup.open(map);
+		    
 		  }
-		})(plantilla));
+		})(i,lista));
 
 
 		arr=[];
