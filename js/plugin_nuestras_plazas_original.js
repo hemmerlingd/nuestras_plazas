@@ -110,7 +110,6 @@ function marcaespacio(lista)
 	var poligono =[];
 		var foto="";
 	for (var i = lista.length - 1; i >= 0; i--) {
-		var bounds = new google.maps.LatLngBounds();
 		/---------COLOR-----------/
 		var a = Math.floor((Math.random() * 255) + 1);
 		var b = Math.floor((Math.random() * 255) + 1);
@@ -119,53 +118,37 @@ function marcaespacio(lista)
 		/-------FIN COLOR---------/
 		
 			//console.log(lista[i]['coordinates'].length);
-		if(lista[i]['tipo']=='cpc')
-		{
-			for (var a = lista[i]['coordinates'].length - 1; a >= 0; a--) {
-				arr.push( new google.maps.LatLng(
-		                    parseFloat(lista[i]['coordinates'][a].lat),
-		                    parseFloat(lista[i]['coordinates'][a].lng)
-		            ));
-			}
-			
-			poligono = new google.maps.Polygon({
-	            paths: arr,
-	            map: map,
-	            strokeColor: color,
-	            strokeOpacity: 0.8,
-	            strokeWeight: 2,
-	            fillColor: color,
-	            fillOpacity: 0.35
-	        });
+		
+		for (var a = lista[i]['coordinates'].length - 1; a >= 0; a--) {
+			arr.push( new google.maps.LatLng(
+	                    parseFloat(lista[i]['coordinates'][a].lat),
+	                    parseFloat(lista[i]['coordinates'][a].lng)
+	            ));
+		}
+		var bounds = new google.maps.LatLngBounds();
 
-				
-			for (var pathidx = 0; pathidx < poligono.getPath().getLength(); pathidx++) {
+		poligono = new google.maps.Polygon({
+            paths: arr,
+            map: map,
+            strokeColor: color,
+            strokeOpacity: 0.8,
+            strokeWeight: 2,
+            fillColor: color,
+            fillOpacity: 0.35
+        });
+
+		for (var pathidx = 0; pathidx < poligono.getPath().getLength(); pathidx++) {
 		      bounds.extend(poligono.getPath().getAt(pathidx));
 		    }
-			
+		poligono.center = bounds.getCenter();	
 
-		    
-		
-		}else{
-			var icon = {
-			    url: "https://www.cordoba.gob.ar/wp-content/uploads/2019/08/elliptical-tree-icon-by-vexels.png", // url
-			    scaledSize: new google.maps.Size(50, 50), // scaled size
-			    origin: new google.maps.Point(0,0), // origin
-			    anchor: new google.maps.Point(0, 0) // anchor
-			};
-			var myLatLng ={lat:lista[i]['coordinates'][1], lng: lista[i]['coordinates'][0]};
-			poligono = new google.maps.Marker({
-	            position: myLatLng,
-	            map: map,
-	            icon: icon
-	        });
-	        bounds.extend(myLatLng);
-		}
+	    var popup = new google.maps.InfoWindow();
+	/*    poligono.addListener('click', function (e) {
+		    popup.setContent(plantilla);
+		    popup.setPosition(e.latLng);
+		    popup.open(map);
+		});*/
 
-			poligono.center = bounds.getCenter();
-		
-
-		var popup = new google.maps.InfoWindow();
 		poligono.addListener('click', (function(position,lista) {
 		  return function() {
 		    // set the content
@@ -181,7 +164,6 @@ function marcaespacio(lista)
 
 		arr=[];
 		poligono=[];
-
 	}
 		
 }
