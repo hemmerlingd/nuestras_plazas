@@ -55,12 +55,16 @@ class nuestras_plazas
 		 wp_register_style('plugin_nuestras_plazas_css', $urlCSSShortcode);
 		$urlJSNuestrasPlazas = $this->cargar_url_asset('/js/plugin_nuestras_plazas.js');
 		 wp_register_script('carga-plugin-nuestras_plazas', $urlJSNuestrasPlazas,null,false,false);
+
+		 $urlJScarrusel = $this->cargar_url_asset('/js/owl.carousel.min.js');
+		 wp_register_script('carga-plugin-carrusel', $urlJScarrusel,null,false,false);
 		
 		global $post;
 	    if( is_a( $post, 'WP_Post' ) && has_shortcode( $post->post_content, 'nuestras_plazas') ) {
 			
 			wp_enqueue_style('plugin_nuestras_plazas_css', $urlCSSShortcode);
 			wp_enqueue_script('carga-plugin-nuestras_plazas',$urlJSNuestrasPlazas,array('jquery'),'1.0.0',true);
+			wp_enqueue_script('carga-plugin-carrusel',$urlJScarrusel,array('jquery'),'1.0.0',true);
 			//wp_enqueue_style('buscador_quinteros.css', $this->cargar_url_asset('/css/shortcodeQuinteros.css'));
 			$nonce_plazas = wp_create_nonce("nuestras_plazas_nonce");
 			wp_localize_script(
@@ -262,8 +266,7 @@ class nuestras_plazas
 	}
 //Gob. Abierto Key
 //AIzaSyAYw1rqa9mL1-__v8h2CVgsRJmpmP2mP1s
-//Nacho
-	//AIzaSyAdhknpOExGWhcYbEXKLfnPHqND4ejjqpE
+
 	
 	public function nuestras_plazas()
 	{
@@ -410,8 +413,7 @@ public function getcalendar($fechas)
 	//echo var_dump($objmeses);
 	$calendar=array();
 	for ($i=0; $i<=count($objmeses)-1 ; $i++) { 
-
-		$html= $this->draw_calendar($objmeses[$i][1],$objmeses[$i][0],$fechas);
+		$html= array("anio"=> $objmeses[$i][0], "mes"=> $objmeses[$i][1], "calendar"=> $this->draw_calendar($objmeses[$i][1],$objmeses[$i][0],$fechas));
 		array_push($calendar,$html);
 	}
 	return $calendar;

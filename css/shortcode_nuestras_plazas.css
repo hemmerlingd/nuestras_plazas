@@ -274,18 +274,18 @@ text-align: center;}
 #map .gm-style-iw-d {overflow: hidden;}
 #map .gm-ui-hover-effect{right: 10px !important}
 #map .gm-ui-hover-effect img{width: 30px !important;height: 30px !important;}
-.info{width: 500px;border-radius: 20px;min-height: 300px}
-.info .cabecera{}
-.info .cabecera .icono{width: 15%;text-align: center;display: inline-block;}
-.info .cabecera .icono img{vertical-align: middle;}
-.info .cabecera .titulo{width: 78%;color:#00a665;font-weight: 700;font-size: 18px;margin-left: 20px;display: inline-block;vertical-align: middle;}
-.info hr{width: 100%;margin: 7px 0px;color:#DFDFD0;}
-.info .nombre{text-align: center;color:#1a1a1a;font-weight: 700;font-size: 16px;margin-bottom: 7px;}
-.info .foto{margin-bottom: 20px;max-height: 280px;overflow: hidden;border-radius: 10px;}
-.info .content_img{width: 45%;display: inline-block;position: relative;}
-.info .foto .mySlides img{width: 100%;object-fit: cover;object-position: center;height: 280px;}
-.mover {position: absolute;height: 280px;background: none;font-size: 75px;color:#000;border: none;left:12px;z-index: 100;}
-.mover.der {margin-left: 445px;}
+.info{width: 500px;border-radius: 20px;min-height: 300px; margin-top: 15px;}
+.cabecera{}
+.cabecera .icono{width: 15%;text-align: center;display: inline-block;}
+.cabecera .icono img{vertical-align: middle;}
+.cabecera .titulo{width: 78%;color:#00a665;font-weight: 700;font-size: 18px;margin-left: 20px;display: inline-block;vertical-align: middle;}
+hr{width: 100%;margin: 7px 0px;color:#DFDFD0;}
+.nombre{text-align: center;color:#1a1a1a;font-weight: 700;font-size: 16px;margin-bottom: 7px;}
+.mySlides img{width: 100%;object-fit: cover;object-position: center;height: 280px;}
+.mover {font-size: 25px;color:#000;border: none;z-index: 100; background-color: #fff;display: inline-block;position: absolute;top: 110px;left: 150px;}
+.mover.der {display: inline-block;left: 350px}
+.nombremes{display: inline-block;font-weight: 700;font-size: 17px;}
+.calendar{margin: 0}
 .info .contratista{font-size: 16px;color:#1a1a1a;}
 .info a{text-align: center;width: 100%;text-decoration: none;display: inline-block;}
 .info a span{background-color: #00a665;color:#fff;padding: 7px 15px;border-radius: 7px;display: inline-block;margin-top: 30px;font-size: 18px;}

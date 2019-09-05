@@ -72,35 +72,34 @@ function showDivs(n) {
 
 
 var objmeses;
+objmeses=new Array();
 
 function dibujarCalendario(position, lista)
 {
-
-
-
-	objmeses=new Array();
-	
-	
 	
 	var calendar="";
-	calendar+="<div class='owl-carousel'>";
-	var mes="";
+	
+	/*calendar+="<div class='owl-carousel owl-theme'>";*/
+	calendar+="<div class='info'><div class='mySlides'>";
+	var calmes="";
 	var estilos="";
+	var mes="";
+	var anio=""
 	for(var i=0; i<=lista[position]['calendarios'].length-1 ;i++)
 	{
-				if(i>0)
+		mes=lista[position]['calendarios'][i].mes;
+		anio=lista[position]['calendarios'][i].anio;
+		if(i>0)
 		{
 			estilos="style='display:none;'";
 		}
-		mes+="<div class='item' "+estilos+"><div class='nombremes'>aslgo</div>";
-		mes+=lista[position]['calendarios'][i];
-		"</div>";
+		calmes+="<div class='item' "+estilos+"><div class='nombremes'>"+getnombremes(mes)+ " - "+ anio +"</div>";
+		calmes+=lista[position]['calendarios'][i].calendar;
+		calmes+="</div>";
 	}
-	calendar+=mes;
-	calendar+="</div>";
+	calendar+=calmes;
 	
-	return "<div class='info'>"+calendar+"<div class='button-mover'><button class='mover izq' onclick='plusDivs(-1)'>&#10094;</button><button class='mover der' onclick='plusDivs(1)'>&#10095;</button></div></div>";	
-
+	return "<div class='cabecera'><div class='icono'><img src='https://www.cordoba.gob.ar/wp-content/uploads/2019/07/arbol.png'></div><div class='titulo'>NUESTRAS PLAZAS Y PASEOS</div></div><hr><div class='nombre'>"+lista[position]['nombre']+"</div><div class='button-mover'><button class='mover izq' onclick='plusDivs(-1)'>&#10094;</button><button class='mover der' onclick='plusDivs(1)'>&#10095;</button></div></div>"+calendar+"</div>";	
 }
 
 function getcalendar(fechas,anio,mes)
@@ -296,6 +295,8 @@ function marcaespacio(lista)
 	}
 		
 }
+
+
 
 	
 function filtra(lista)
