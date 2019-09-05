@@ -133,10 +133,14 @@ class nuestras_plazas
 		foreach ($resultado->results->features as $zona) {
 			if(!isset($zona->properties->nombre)){
 				$foto = $zona->properties->adjuntos;
-				$objzona=['id'=> $zona->id, 'nombre' => $zona->properties->descripcion_frente, 'foto'=> $foto, 'coordinates'=> $zona->geometry->coordinates,'tipo'=>'plaza'];
+				
+				$calendar=$this->getcalendar($zona->properties->fechas_de_trabajos);
+
+				$objzona=['id'=> $zona->id, 'nombre' => $zona->properties->descripcion_frente, 'foto'=> $arrfotos,'calendarios'=>$calendar, 'coordinates'=> $zona->geometry->coordinates,'tipo'=>'plaza'];
 			}else{
 				if ($zona->geometry->coordinates[0]){
-					$objzona=['id'=> $zona->id, 'nombre' => $zona->properties->nombre, 'foto'=>$arrfotos, 'coordinates'=> $this->formatcoordenadas($zona->geometry->coordinates[0]),'tipo'=>'cpc'];
+					$calendar=array();
+					$objzona=['id'=> $zona->id, 'nombre' => $zona->properties->nombre, 'foto'=>$arrfotos,'calendarios'=>$calendar, 'coordinates'=> $this->formatcoordenadas($zona->geometry->coordinates[0]),'tipo'=>'cpc'];
 				}
 			}	
 			array_push($plazas,(array)$objzona );
@@ -192,8 +196,7 @@ class nuestras_plazas
 		$sc="";
 
 		$sc.='
-		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAdhknpOExGWhcYbEXKLfnPHqND4ejjqpE"
-  type="text/javascript"></script>
+		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAdhknpOExGWhcYbEXKLfnPHqND4ejjqpE" type="text/javascript"></script>
 		<script src="'. plugin_dir_url( __FILE__ ). 'js/plugin_nuestras_plazas.js"></script>
 		<div id="plazas">
 		<div id="buscador">
@@ -248,8 +251,12 @@ class nuestras_plazas
 			$html.='
 			<script>
 			var lista = '.json_encode($datos).';
+			var plugindir="'.plugin_dir_url( __FILE__ ).'";
 			mapaPlazas();
-			marcaespacio(lista);</script></div>';
+			marcaespacio(lista);
+
+		
+			</script></div>';
 			return $html;
 
 	}
@@ -271,6 +278,7 @@ class nuestras_plazas
 			//$api_data = json_decode(wp_remote_retrieve_body($api_response), true);
 			//var_dump($api_data);
 			$datos=$this->actualizar(self::$URL_API_GOB.'?id_zona='.$zona);
+
 			$response = array( 'success' => true, 'data' => $datos ); // if $data passed
 			wp_send_json_success($response);
 		} else {
@@ -297,6 +305,118 @@ class nuestras_plazas
 	}
 	*/
 	
+
+
+	public function marcadia($lista_fechas,$dia,$mes)
+	{
+		for($x=0;$x<=count($lista_fechas)-1;$x++)
+			{
+
+				
+				
+			}
+
+	}
+
+	public function draw_calendar($month,$year,$fechas){
+
+	/* draw table */
+	$calendar = '<table cellpadding="0" cellspacing="0" class="calendar">';
+
+	/* table headings */
+	$headings = array('D','L','M','M','J','V','S');
+	$calendar.= '<tr class="calendar-row"><td class="calendar-day-head">'.implode('</td><td class="calendar-day-head">',$headings).'</td></tr>';
+
+	/* days and weeks vars now ... */
+	$running_day = date('w',mktime(0,0,0,$month,1,$year));
+	$days_in_month = date('t',mktime(0,0,0,$month,1,$year));
+	$days_in_this_week = 1;
+	$day_counter = 0;
+	$dates_array = array();
+
+	/* row for week one */
+	$calendar.= '<tr class="calendar-row">';
+
+	/* print "blank" days until the first of the current week */
+	for($x = 0; $x < $running_day; $x++):
+		$calendar.= '<td class="calendar-day-np"> </td>';
+		$days_in_this_week++;
+	endfor;
+
+	/* keep going with days.... */
+	for($list_day = 1; $list_day <= $days_in_month; $list_day++):
+		$calendar.= '<td class="calendar-day">';
+			/* add in the day number */
+			//$band=existe($fechas,$list_day,$month);
+			//var_dump($band);
+			
+			
+			/*if(is_array($band)){
+				//echo "entro";
+				$link="javascript:abrir('".$band["idcurso"]."','".$band["color"]."')";
+				$calendar.= '<div class="day-number"><a href="'.$link.'" class="color_'.$band["color"].'"><span>'.$list_day.'</span></a></div>';	
+			}else{
+				$calendar.= '<div class="day-number">'.$list_day.'</div>';
+			}
+			*/
+			$calendar.= '<div class="day-number">'.$list_day.'</div>';
+
+			/** QUERY THE DATABASE FOR AN ENTRY FOR THIS DAY !!  IF MATCHES FOUND, PRINT THEM !! **/
+			$calendar.= str_repeat('<p> </p>',2);
+			
+		$calendar.= '</td>';
+		if($running_day == 6):
+			$calendar.= '</tr>';
+			if(($day_counter+1) != $days_in_month):
+				$calendar.= '<tr class="calendar-row">';
+			endif;
+			$running_day = -1;
+			$days_in_this_week = 0;
+		endif;
+		$days_in_this_week++; $running_day++; $day_counter++;
+	endfor;
+
+	/* finish the rest of the days in the week */
+	if($days_in_this_week < 8):
+		for($x = 1; $x <= (8 - $days_in_this_week); $x++):
+			$calendar.= '<td class="calendar-day-np"> </td>';
+		endfor;
+	endif;
+
+	/* final row */
+	$calendar.= '</tr>';
+
+	/* end the table */
+	$calendar.= '</table>';
+	
+	/* all done, return result */
+	return $calendar;
+}
+
+public function getcalendar($fechas)
+{
+	
+	$objmeses=array();
+	for ($i=0; $i<=count($fechas)-1 ; $i++) { 
+		$fec=explode("-",$fechas[$i]->fecha);
+		$anio=$fec[0];
+		$mes=$fec[1];
+		$aux=array($anio,$mes);
+		if(!in_array($aux,$objmeses))
+		{
+			array_push($objmeses, $aux);
+		}
+	}
+	//echo var_dump($objmeses);
+	$calendar=array();
+	for ($i=0; $i<=count($objmeses)-1 ; $i++) { 
+
+		$html= $this->draw_calendar($objmeses[$i][1],$objmeses[$i][0],$fechas);
+		array_push($calendar,$html);
+	}
+	return $calendar;
+}
+
 
 	
 

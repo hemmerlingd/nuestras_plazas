@@ -10,7 +10,7 @@ var map;
 	let $map = $resultados.find('#map');
 
 $form.submit(function(e) {
-	console.log("click");
+	
     e.preventDefault();
     //const datos = $form.serializeArray();
     //console.log(datos);
@@ -52,7 +52,7 @@ function mapaPlazas()
 }
 
 var slideIndex = 1;
-//showDivs(slideIndex);
+
 
 function plusDivs(n) {
   showDivs(slideIndex += n);
@@ -60,15 +60,124 @@ function plusDivs(n) {
 
 function showDivs(n) {
   var i;
-  var x = document.getElementsByClassName("mySlides");
+  var x = document.getElementsByClassName("item");
   if (n > x.length) {slideIndex = 1}
-  if (n < 1) {slideIndex = x.length}
+  if (n < 1) {slideIndex = x.length} ;
   for (i = 0; i < x.length; i++) {
-    x[i].style.display = "none";  
+    x[i].style.display = "none";
   }
-  x[slideIndex-1].style.display = "block";  
+  x[slideIndex-1].style.display = "block";
 }
 
+
+
+var objmeses;
+
+function dibujarCalendario(position, lista)
+{
+
+
+
+	objmeses=new Array();
+	
+	
+	
+	var calendar="";
+	calendar+="<div class='owl-carousel'>";
+	var mes="";
+	var estilos="";
+	for(var i=0; i<=lista[position]['calendarios'].length-1 ;i++)
+	{
+				if(i>0)
+		{
+			estilos="style='display:none;'";
+		}
+		mes+="<div class='item' "+estilos+"><div class='nombremes'>aslgo</div>";
+		mes+=lista[position]['calendarios'][i];
+		"</div>";
+	}
+	calendar+=mes;
+	calendar+="</div>";
+	
+	return "<div class='info'>"+calendar+"<div class='button-mover'><button class='mover izq' onclick='plusDivs(-1)'>&#10094;</button><button class='mover der' onclick='plusDivs(1)'>&#10095;</button></div></div>";	
+
+}
+
+function getcalendar(fechas,anio,mes)
+{
+	(function(window, document, $) {
+		$.ajax({
+	      type: "POST",
+	      dataType: "JSON",
+	      url: plugindir+"calendario.php",
+	      data: {
+	        fechas: fechas,
+	        anio: anio,
+	        mes:mes
+	      },
+	      success: function(response) {
+	      	
+	        return response.html;
+	      }
+	    });
+	})(window, document, jQuery);
+}
+
+function getnombremes(mes)
+{
+	switch (mes) {
+  		case "01":
+    		return "ENERO";
+    		break;
+    	case "02":
+    		return "FEBRERO";
+    		break;
+    	case "03":
+    		return "MARZO";
+    		break;
+    	case "04":
+    		return "ABRIL";
+    		break;
+    	case "05":
+    		return "MAYO";
+    		break;
+    	case "06":
+    		return "JUNIO";
+    		break;
+    	case "07":
+    		return "JULIO";
+    		break;
+    	case "08":
+    		return "AGOSTO";
+    		break;
+    	case "09":
+    		return "SEPTIEMBRE";
+    		break;
+    	case "10":
+    		return "OCTUBRE";
+    		break;
+    	case "11":
+    		return "NOVIEMBRE";
+    		break;
+    	case "12":
+    		return "DICIEMBRE";
+    		break;
+  
+	}	
+}
+
+function yaexiste(anio,mes)
+{
+	var band=false;
+	
+	for(var i=0; i<=objmeses.length-1 ;i++){
+		if(objmeses[i][0]==anio && objmeses[i][1]==mes)
+		{
+			band=true;
+		}
+	}
+	return band;
+}
 function mostrarfoto(position,lista){
 	var	foto="";
 	/*lista[position]['foto'].length-1*/
@@ -105,7 +214,7 @@ function mostrarfoto(position,lista){
 function marcaespacio(lista)
 {
 	
-	//console.log(lista);
+	console.log(lista);
 	var arr = new Array();
 	var poligono =[];
 		var foto="";
@@ -164,17 +273,19 @@ function marcaespacio(lista)
 
 			poligono.center = bounds.getCenter();
 		
-
+		
 		var popup = new google.maps.InfoWindow();
 		poligono.addListener('click', (function(position,lista) {
 		  return function() {
 		    // set the content
-		    popup.setContent(mostrarfoto(position,lista));
+		    //popup.setContent(mostrarfoto(position,lista));
+		    popup.setContent(dibujarCalendario(position,lista));
 		    // set the position
 		    popup.setPosition(this.center);
 		    // open it
 		    popup.open(map);
 		    
+		   
 		  }
 		})(i,lista));
 
