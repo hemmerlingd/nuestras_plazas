@@ -40,6 +40,10 @@ $form.submit(function(e) {
 
 
 
+
+
+
+
 function mapaPlazas()
 {
 	map = new google.maps.Map(document.getElementById('map'), {
@@ -63,16 +67,16 @@ function showDivs(n) {
   var x = document.getElementsByClassName("item");
   if (n > x.length) {slideIndex = 1}
   if (n < 1) {slideIndex = x.length} ;
-  for (i = 0; i < x.length; i++) {
+  for (i = 0; i < x.length-1; i++) {
     x[i].style.display = "none";
   }
   x[slideIndex-1].style.display = "block";
 }
 
 
-
 var objmeses;
 objmeses=new Array();
+
 
 function dibujarCalendario(position, lista)
 {
@@ -177,43 +181,69 @@ function yaexiste(anio,mes)
 	}
 	return band;
 }
-function mostrarfoto(position,lista){
+
+var calendariodibujado;
+function mostrarFotos(id,anio,mes,dia,id_zona){
 	var	foto="";
+	var fecha;
+	var hasta
+	var url;
+	fecha=dia+"-"+mes+"-"+anio;
+    var fecha2 = new Date(anio,mes,dia,0,0,0,0);
+	fecha2.setDate(fecha2.getDate() + 1);
+
+	hasta=fecha2.getDate()+"-"+("0" + (fecha2.getMonth())).slice(-2)+"-"+fecha2.getFullYear();
 	/*lista[position]['foto'].length-1*/
 	var x=0;
-	var fecha;
-	var fechaformateada;
-	var cant=lista[position]['foto'].length-1;
-	for (var b=0; b<=lista[position]['foto'].length-1 ;b++){
-		if(x==0){
-			foto+="<div class='mySlides'>";
-		}
-		console.log(lista[position]['foto'][b].foto);
-		if(lista[position]['foto'][b].fecha !== null){
-			fecha = lista[position]['foto'][b].fecha.substring(0,10);
-			fecha = fecha.split('-');
-			fechaformateada = fecha[2]+'-'+fecha[1]+'-'+fecha[0];
-		}else{
-			fechaformateada='';
-		}
-		foto += "<div class='content_img'><img src='https://gobiernoabierto.cordoba.gob.ar/"+lista[position]['foto'][b].foto.thumbnail_500+"'><div class='fecha'>"+fechaformateada+"</div></div>";
-		if(x==1 || b==cant){
-			foto+="</div>";
-			x=0;
-		}else{
-			x+=1;
-		}
-		
-	}
-	
-	return "<div class='info'><div class='cabecera'><div class='icono'><img src='https://www.cordoba.gob.ar/wp-content/uploads/2019/07/arbol.png'></div><div class='titulo'>NUESTRAS PLAZAS Y PASEOS</div></div><hr><div class='nombre'>"+lista[position]['nombre']+"</div><div class='button-mover'><button class='mover izq' onclick='plusDivs(-1)'>&#10094;</button><button class='mover der' onclick='plusDivs(1)'>&#10095;</button></div><div class='foto' id='content_foto'>"+foto+"</div></div>";
+	url = "https://gobiernoabierto.cordoba.gob.ar/api/v2/espacios-verdes/fotos-frentes-espacios-verdes/?desde="+fecha+"&hasta="+hasta+"&id_trabajo="+id;
+	https://gobiernoabierto.cordoba.gob.ar/api/v2/espacios-verdes/fotos-frentes-espacios-verdes/?id_trabajo=233&desde=17-08-2017&hasta=18-08-2017
+	(function(window, document, $) {
+		$.ajax({
+	      type: "GET",
+	      dataType: "JSON",
+	      url: url,
+	      data: {
+	      },
+	      success: function(response) {
+	      	calendariodibujado = $('.mySlides').html();
+	      	$('.mySlides').html("<div class='linkvolver'></div>"+cargarFotos(response,fecha));
+	      	//showDivs(1);
+	      	$('.linkvolver').html("<div class='volver' onclick='volverCalendario();'>Volver al Calendario</div>");
+	      	$('.nombremes').hide();
+	      }
+	    });
+	})(window, document, jQuery);
 }
 
+function cargarFotos(lista,fechaformateada){
+	var foto="";
+	var estilos ="";
+	//	console.log(lista);
+	for (var b=0; b<=lista['results'].length-1 ;b++){
+		if(b>0)
+		{
+			estilos="style='display:none;'";
+		}
+		foto += "<div class='item' "+estilos+"><div class='content_img'><img src='"+lista['results'][b]['foto'].thumbnail_500+"'><div class='fecha'>"+fechaformateada+"</div></div></div>";
+		
+	}
+
+	return "<div class='foto' id='content_foto'>"+foto+"</div><br>";
+}
+
+function volverCalendario(){
+	(function(window, document, $) {
+	      	$('.mySlides').html(calendariodibujado);
+	      	//showDivs(1);
+	      	$('.linkvolver').html("");
+	      	$('.nombremes').show();
+	})(window, document, jQuery);
+}
 
 function marcaespacio(lista)
 {
 	
-	console.log(lista);
+	//console.log(lista);
 	var arr = new Array();
 	var poligono =[];
 		var foto="";

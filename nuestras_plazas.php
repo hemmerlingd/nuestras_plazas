@@ -138,7 +138,7 @@ class nuestras_plazas
 			if(!isset($zona->properties->nombre)){
 				$foto = $zona->properties->adjuntos;
 				
-				$calendar=$this->getcalendar($zona->properties->fechas_de_trabajos);
+				$calendar=$this->getcalendar($zona->properties->fechas_de_trabajos,$zona->id,$zona->properties->id_obra);
 
 				$objzona=['id'=> $zona->id, 'nombre' => $zona->properties->descripcion_frente, 'foto'=> $arrfotos,'calendarios'=>$calendar, 'coordinates'=> $zona->geometry->coordinates,'tipo'=>'plaza'];
 			}else{
@@ -310,18 +310,24 @@ class nuestras_plazas
 	
 
 
-	public function marcadia($lista_fechas,$dia,$mes)
+	public function marcadia($lista_fechas,$dia,$mes,$anio)
 	{
+		$band=false;
 		for($x=0;$x<=count($lista_fechas)-1;$x++)
 			{
-
-				
-				
+				$arrfecha=explode("-", $lista_fechas[$x]->fecha);
+				$aniomarca = $arrfecha[0];
+				$mesmarca = $arrfecha[1];
+				$diamarca = substr($arrfecha[2], 0,2);
+				if ($dia == $diamarca && $mes == $mesmarca && $anio == $aniomarca) {
+					$band =true;
+				}
 			}
+					return $band;
 
 	}
 
-	public function draw_calendar($month,$year,$fechas){
+	public function draw_calendar($month,$year,$fechas,$id,$id_zona){
 
 	/* draw table */
 	$calendar = '<table cellpadding="0" cellspacing="0" class="calendar">';
@@ -350,19 +356,16 @@ class nuestras_plazas
 	for($list_day = 1; $list_day <= $days_in_month; $list_day++):
 		$calendar.= '<td class="calendar-day">';
 			/* add in the day number */
-			//$band=existe($fechas,$list_day,$month);
+			$band= $this->marcadia($fechas,$list_day,$month,$year);
 			//var_dump($band);
-			
-			
-			/*if(is_array($band)){
-				//echo "entro";
-				$link="javascript:abrir('".$band["idcurso"]."','".$band["color"]."')";
-				$calendar.= '<div class="day-number"><a href="'.$link.'" class="color_'.$band["color"].'"><span>'.$list_day.'</span></a></div>';	
+			if ($band){
+				$link="javascript:mostrarFotos('".$id."','".$year."','".$month."','".$list_day."','".$id_zona."')";
+				$calendar.= '<div class="day-number"><a href="'.$link.'" class="color_green"><span>'.$list_day.'</span></a></div>';	
+
 			}else{
 				$calendar.= '<div class="day-number">'.$list_day.'</div>';
+
 			}
-			*/
-			$calendar.= '<div class="day-number">'.$list_day.'</div>';
 
 			/** QUERY THE DATABASE FOR AN ENTRY FOR THIS DAY !!  IF MATCHES FOUND, PRINT THEM !! **/
 			$calendar.= str_repeat('<p> </p>',2);
@@ -396,7 +399,8 @@ class nuestras_plazas
 	return $calendar;
 }
 
-public function getcalendar($fechas)
+
+public function getcalendar($fechas,$id,$id_zona)
 {
 	
 	$objmeses=array();
@@ -413,7 +417,7 @@ public function getcalendar($fechas)
 	//echo var_dump($objmeses);
 	$calendar=array();
 	for ($i=0; $i<=count($objmeses)-1 ; $i++) { 
-		$html= array("anio"=> $objmeses[$i][0], "mes"=> $objmeses[$i][1], "calendar"=> $this->draw_calendar($objmeses[$i][1],$objmeses[$i][0],$fechas));
+		$html= array("anio"=> $objmeses[$i][0], "mes"=> $objmeses[$i][1], "calendar"=> $this->draw_calendar($objmeses[$i][1],$objmeses[$i][0],$fechas,$id,$id_zona));
 		array_push($calendar,$html);
 	}
 	return $calendar;
