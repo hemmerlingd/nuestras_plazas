@@ -191,11 +191,16 @@ function mostrarFotos(id,anio,mes,dia,id_zona){
 	var fecha;
 	var hasta
 	var url;
+	var diciembre="";
 	fecha=dia+"-"+mes+"-"+anio;
     var fecha2 = new Date(anio,mes,dia,0,0,0,0);
 	fecha2.setDate(fecha2.getDate() + 1);
+	diciembre= fecha2.getMonth();
+	if (diciembre == 0){
+		diciembre= 12;
+	}
 
-	hasta=fecha2.getDate()+"-"+("0" + (fecha2.getMonth())).slice(-2)+"-"+fecha2.getFullYear();
+	hasta=fecha2.getDate()+"-"+("0" + (diciembre)).slice(-2)+"-"+fecha2.getFullYear();
 	/*lista[position]['foto'].length-1*/
 	var x=0;
 	url = "https://gobiernoabierto.cordoba.gob.ar/api/v2/espacios-verdes/fotos-frentes-espacios-verdes/?desde="+fecha+"&hasta="+hasta+"&id_trabajo="+id;
