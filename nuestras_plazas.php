@@ -360,7 +360,7 @@ class nuestras_plazas
 			//var_dump($band);
 			if ($band){
 				$link="javascript:mostrarFotos('".$id."','".$year."','".$month."','".$list_day."','".$id_zona."')";
-				$calendar.= '<div class="day-number"><a href="'.$link.'" class="color_green"><span>'.$list_day.'</span></a></div>';	
+				$calendar.= '<div class="day-number color_green"><a href="'.$link.'" class="color_green"><span>'.$list_day.'</span></a></div>';	
 
 			}else{
 				$calendar.= '<div class="day-number">'.$list_day.'</div>';
@@ -368,7 +368,7 @@ class nuestras_plazas
 			}
 
 			/** QUERY THE DATABASE FOR AN ENTRY FOR THIS DAY !!  IF MATCHES FOUND, PRINT THEM !! **/
-			$calendar.= str_repeat('<p> </p>',2);
+			//$calendar.= str_repeat('<p> </p>',2);
 			
 		$calendar.= '</td>';
 		if($running_day == 6):

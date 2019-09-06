@@ -67,10 +67,13 @@ function showDivs(n) {
   var x = document.getElementsByClassName("item");
   if (n > x.length) {slideIndex = 1}
   if (n < 1) {slideIndex = x.length} ;
-  for (i = 0; i < x.length-1; i++) {
+  for (i = 0; i < x.length; i++) {
     x[i].style.display = "none";
   }
-  x[slideIndex-1].style.display = "block";
+  if(typeof x[slideIndex-1].style!==undefined)
+  {
+  	x[slideIndex-1].style.display = "block";
+  }
 }
 
 
@@ -219,12 +222,14 @@ function cargarFotos(lista,fechaformateada){
 	var foto="";
 	var estilos ="";
 	//	console.log(lista);
+	var cant=lista['results'].length;
 	for (var b=0; b<=lista['results'].length-1 ;b++){
 		if(b>0)
 		{
 			estilos="style='display:none;'";
 		}
-		foto += "<div class='item' "+estilos+"><div class='content_img'><img src='"+lista['results'][b]['foto'].thumbnail_500+"'><div class='fecha'>"+fechaformateada+"</div></div></div>";
+		var x=b+1;
+		foto += "<div class='item' "+estilos+"><div class='content_img'><img src='"+lista['results'][b]['foto'].thumbnail_500+"'><div class='fecha'>[Foto "+x+" de "+cant+"] "+fechaformateada+"</div></div></div>";
 		
 	}
 
@@ -304,19 +309,22 @@ function marcaespacio(lista)
 		
 		
 		var popup = new google.maps.InfoWindow();
-		poligono.addListener('click', (function(position,lista) {
-		  return function() {
-		    // set the content
-		    //popup.setContent(mostrarfoto(position,lista));
-		    popup.setContent(dibujarCalendario(position,lista));
-		    // set the position
-		    popup.setPosition(this.center);
-		    // open it
-		    popup.open(map);
-		    
-		   
-		  }
-		})(i,lista));
+		if(lista[i]['tipo']!='cpc')
+		{
+			poligono.addListener('click', (function(position,lista) {
+			  return function() {
+			    // set the content
+			    //popup.setContent(mostrarfoto(position,lista));
+			    popup.setContent(dibujarCalendario(position,lista));
+			    // set the position
+			    popup.setPosition(this.center);
+			    // open it
+			    popup.open(map);
+			    
+			   
+			  }
+			})(i,lista));
+		}
 
 
 		arr=[];
