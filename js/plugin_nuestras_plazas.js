@@ -249,7 +249,7 @@ function volverCalendario(){
 	      	$('.nombremes').show();
 	})(window, document, jQuery);
 }
-
+var lbl;
 function marcaespacio(lista)
 {
 	
@@ -276,6 +276,7 @@ function marcaespacio(lista)
 		            ));
 			}
 			
+
 			poligono = new google.maps.Polygon({
 	            paths: arr,
 	            map: map,
@@ -290,7 +291,7 @@ function marcaespacio(lista)
 			for (var pathidx = 0; pathidx < poligono.getPath().getLength(); pathidx++) {
 		      bounds.extend(poligono.getPath().getAt(pathidx));
 		    }
-			
+			lbl = new Label(bounds, lista[i]['nombre'], map);
 
 		    
 		
@@ -338,6 +339,69 @@ function marcaespacio(lista)
 	}
 		
 }
+
+
+Label.prototype = new google.maps.OverlayView();
+/** @constructor */
+function Label(bounds, texto, map) {
+
+    // Initialize all properties.
+    this.bounds_ = bounds;
+    this.txt_ = texto;
+    this.map_ = map;
+
+    // Define a property to hold the image's div. We'll
+    // actually create this div upon receipt of the onAdd()
+    // method so we'll leave it null for now.
+    this.div_ = null;
+
+    // Explicitly call setMap on this overlay.
+    this.setMap(map);
+}
+
+Label.prototype.onAdd = function() {
+
+    var div = document.createElement('div');
+    div.style.borderStyle = 'none';
+    div.style.borderWidth = '0px';
+    div.style.position = 'absolute';
+    div.style.fontSize = '15px';
+    div.style.fontWeight = '700';
+    div.style.width='80px';
+    div.style.height='80px';
+
+    div.innerHTML=this.txt_;
+    // Create the img element and attach it to the div.
+    
+    this.div_ = div;
+
+    // Add the element to the "overlayLayer" pane.
+    var panes = this.getPanes();
+    panes.overlayLayer.appendChild(div);
+};
+
+Label.prototype.draw = function() {
+
+    // We use the south-west and north-east
+    // coordinates of the overlay to peg it to the correct position and size.
+    // To do this, we need to retrieve the projection from the overlay.
+    var overlayProjection = this.getProjection();
+
+    // Retrieve the south-west and north-east coordinates of this overlay
+    // in LatLngs and convert them to pixel coordinates.
+    // We'll use these coordinates to resize the div.
+    var sw = overlayProjection.fromLatLngToDivPixel(this.bounds_.getSouthWest());
+    var ne = overlayProjection.fromLatLngToDivPixel(this.bounds_.getNorthEast());
+    var centro = overlayProjection.fromLatLngToDivPixel(this.bounds_.getCenter());
+
+    // Resize the image's div to fit the indicated dimensions.
+    var div = this.div_;
+
+    div.style.left = centro.x-40 + 'px';
+    div.style.top = centro.y-20 + 'px';
+    //div.style.width = (ne.x - sw.x) + 'px';
+    //div.style.height = (sw.y - ne.y) + 'px';
+};
 
 
 
