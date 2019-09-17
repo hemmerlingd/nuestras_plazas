@@ -56,15 +56,15 @@ class nuestras_plazas
 		$urlJSNuestrasPlazas = $this->cargar_url_asset('/js/plugin_nuestras_plazas.js');
 		 wp_register_script('carga-plugin-nuestras_plazas', $urlJSNuestrasPlazas,null,false,false);
 
-		 $urlJScarrusel = $this->cargar_url_asset('/js/owl.carousel.min.js');
-		 wp_register_script('carga-plugin-carrusel', $urlJScarrusel,null,false,false);
+		// $urlJScarrusel = $this->cargar_url_asset('/js/owl.carousel.min.js');
+		// wp_register_script('carga-plugin-carrusel', $urlJScarrusel,null,false,false);
 		
 		global $post;
 	    if( is_a( $post, 'WP_Post' ) && has_shortcode( $post->post_content, 'nuestras_plazas') ) {
 			
 			wp_enqueue_style('plugin_nuestras_plazas_css', $urlCSSShortcode);
 			wp_enqueue_script('carga-plugin-nuestras_plazas',$urlJSNuestrasPlazas,array('jquery'),'1.0.0',true);
-			wp_enqueue_script('carga-plugin-carrusel',$urlJScarrusel,array('jquery'),'1.0.0',true);
+			//wp_enqueue_script('carga-plugin-carrusel',$urlJScarrusel,array('jquery'),'1.0.0',true);
 			//wp_enqueue_style('buscador_quinteros.css', $this->cargar_url_asset('/css/shortcodeQuinteros.css'));
 			$nonce_plazas = wp_create_nonce("nuestras_plazas_nonce");
 			wp_localize_script(
